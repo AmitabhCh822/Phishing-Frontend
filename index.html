@@ -142,17 +142,18 @@ async function analyzeEmail() {
             <h3 class="text-xl font-bold mb-3 ${isPhishing ? 'text-red-600' : 'text-green-600'}">
                 ${isPhishing ? "🚨 Phishing Detected" : "✅ Safe Email"}
             </h3>
+        
             <p class="text-gray-700 text-lg font-medium">
                 Confidence: ${(isPhishing ? data.phishing_prob : data.safe_prob).toFixed(2)}%
             </p>
-
+        
             <div class="mt-4">
                 <p class="font-semibold text-gray-700">Indicators:</p>
                 <ul class="list-disc ml-6 text-gray-600">
                     ${
                         isPhishing
-                        ? "<li>Suspicious wording detected</li><li>Matches phishing patterns in the dataset</li>"
-                        : "<li>No strong phishing characteristics detected</li>"
+                        ? "<li>Patterns matching known phishing behavior</li><li>Suspicious content detected</li>"
+                        : "<li>No major phishing indicators found</li>"
                     }
                 </ul>
             </div>
