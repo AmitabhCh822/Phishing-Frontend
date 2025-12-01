@@ -129,7 +129,8 @@ async function analyzeEmail() {
         const response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: email })
+
+            body: JSON.stringify({ email: email }) 
         });
 
         const data = await response.json();
@@ -143,8 +144,9 @@ async function analyzeEmail() {
             </h3>
 
             <p class="text-gray-700 text-lg font-medium">
-                The model classified this email as: <span class="font-bold">
-                ${isPhishing ? "Phishing" : "Safe"}</span>.
+                Confidence: <span class="font-bold">
+                    ${isPhishing ? data.phishing_prob : data.safe_prob}%
+                </span>
             </p>
 
             <div class="mt-4">
@@ -161,7 +163,7 @@ async function analyzeEmail() {
 
     } catch (err) {
         console.error(err);
-        alert("Error contacting backend: " + err);
+        alert("Error contacting backend.");
     }
 
     btn.innerHTML = "Analyze Email";
