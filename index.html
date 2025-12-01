@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhishGuard AI</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="logo.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -15,14 +11,11 @@
             border: 3px solid #e5e7eb;
             border-top: 3px solid #4f46e5;
             border-radius: 50%;
-            width: 8px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 
@@ -33,10 +26,7 @@
         <!-- HEADER -->
         <div class="bg-white shadow-lg rounded-2xl p-6 mb-6 flex items-center justify-between">
             <div>
-                <div class="flex items-center gap-3">
-                    <img src="logo.png" alt="Logo" class="w-12 h-12">
-                    <h1 class="text-3xl font-bold text-gray-800">PhishGuard AI</h1>
-                </div>
+                <h1 class="text-3xl font-bold text-gray-800">PhishGuard AI</h1>
                 <p class="text-gray-600">AI-Powered Phishing Email Detector</p>
             </div>
 
@@ -165,21 +155,21 @@
 <script>
 /* --- SAMPLE EMAILS --- */
 const samples = {
-    phishing: URGENT: Your account has been suspended.
+    phishing: `URGENT: Your account has been suspended.
 Click the link below immediately to verify your identity:
 http://malicious-login.com/verify
-Failure to act will result in permanent account closure.,
+Failure to act will result in permanent account closure.`,
 
-    safe: Hi Team,
+    safe: `Hi Team,
 Just a reminder that the Q4 project meeting is scheduled for Tuesday.
 Let me know if you need any documents beforehand.
 Best,
-John,
+John`,
 
-    suspicious: Hello user,
+    suspicious: `Hello user,
 Your mailbox storage is almost full.
 Click the following link to increase your quota:
-http://unknown-service.com/upgrade
+http://unknown-service.com/upgrade`
 };
 
 function loadSample(type) {
@@ -221,13 +211,13 @@ async function analyzeEmail() {
             indicators.push("Email unusually short (possible scam)");
 
         const indicatorList = indicators.length
-            ? indicators.map(i => <li>${i}</li>).join("")
+            ? indicators.map(i => `<li>${i}</li>`).join("")
             : "<li>No major phishing indicators detected</li>";
 
         resultBox.classList.remove("hidden");
 
         /* --- UI RESULT BLOCK --- */
-        resultBox.innerHTML = 
+        resultBox.innerHTML = `
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold ${isPhishing ? 'text-red-600' : 'text-green-600'}">
                     ${isPhishing ? "🚨 Phishing Detected" : "✅ Safe Email"}
@@ -257,7 +247,7 @@ async function analyzeEmail() {
             <ul class="list-disc ml-6 text-gray-600">
                 ${indicatorList}
             </ul>
-        ;
+        `;
 
     } catch (err) {
         alert("Error contacting backend.");
