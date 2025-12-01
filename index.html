@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PhishGuard AI</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png" />
 
+    <!-- Tailwind with dark mode enabled -->
+    <script>
+        tailwind = {
+            config: {
+                darkMode: 'class'
+            }
+        };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -15,275 +23,535 @@
             border: 3px solid #e5e7eb;
             border-top: 3px solid #4f46e5;
             border-radius: 50%;
-            width: 8px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-indigo-50 via-white to-blue-50 min-h-screen py-10">
-
+<body class="h-full bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 min-h-screen py-10 transition-colors">
     <div class="max-w-5xl mx-auto px-4">
 
         <!-- HEADER -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 mb-6 flex items-center justify-between">
+        <header class="bg-white/90 dark:bg-slate-900 shadow-lg rounded-2xl p-6 mb-6 flex items-center justify-between backdrop-blur-sm border border-slate-100 dark:border-slate-800">
             <div>
                 <div class="flex items-center gap-3">
-                    <img src="logo.png" alt="Logo" class="w-12 h-12">
-                    <h1 class="text-3xl font-bold text-gray-800">PhishGuard AI</h1>
+                    <img src="logo.png" alt="PhishGuard AI logo" class="w-12 h-12 rounded-xl shadow-sm" />
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-slate-50">PhishGuard AI</h1>
+                        <p class="text-gray-600 dark:text-slate-300 text-sm">
+                            Email security intelligence developed by Amitabh’s Cyber-AI Lab
+                        </p>
+                    </div>
                 </div>
-                <p class="text-gray-600">AI-Powered Phishing Email Detector</p>
             </div>
 
-            <div class="text-right">
-                <p class="text-sm text-gray-500">Model Accuracy</p>
-                <p class="text-3xl font-bold text-green-600">95.71%</p>
+            <div class="flex flex-col items-end gap-2">
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">Model Accuracy</p>
+                    <p class="text-2xl font-bold text-green-600">95.71%</p>
+                </div>
 
-                <button onclick="openModelModal()" 
-                    class="mt-2 text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg border border-indigo-300 hover:bg-indigo-200">
-                    Model Info
-                </button>
+                <div class="flex gap-2">
+                    <button
+                        id="themeToggle"
+                        class="flex items-center gap-1 text-xs px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                    >
+                        <span id="themeIcon">🌙</span>
+                        <span id="themeLabel">Dark</span>
+                    </button>
+
+                    <button
+                        onclick="openModelModal()"
+                        class="text-xs px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 dark:hover:bg-indigo-900 transition"
+                    >
+                        Model Info
+                    </button>
+                </div>
             </div>
-        </div>
+        </header>
 
         <!-- MAIN PANEL -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                📧 Email Content Analysis
-            </h2>
-
-            <!-- SAMPLE EMAIL BUTTONS -->
-            <div class="flex gap-3 mb-4">
-                <button onclick="loadSample('phishing')" 
-                    class="text-sm bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200 hover:bg-red-100">
-                    Load Phishing Sample
-                </button>
-
-                <button onclick="loadSample('safe')" 
-                    class="text-sm bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-200 hover:bg-green-100">
-                    Load Safe Sample
-                </button>
-
-                <button onclick="loadSample('suspicious')" 
-                    class="text-sm bg-yellow-50 text-yellow-700 px-4 py-2 rounded-lg border border-yellow-200 hover:bg-yellow-100">
-                    Load Suspicious Sample
-                </button>
-            </div>
-
-            <textarea
-                id="emailContent"
-                class="w-full h-52 p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
-                placeholder="Paste the email content you want to analyze..."
-            ></textarea>
-
-            <div class="flex gap-3 mt-4">
-                <button
-                    onclick="analyzeEmail()"
-                    id="analyzeBtn"
-                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2"
-                >
-                    Analyze Email
-                </button>
-
-                <button
-                    onclick="resetInput()"
-                    class="px-5 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium text-gray-700"
-                >
-                    Reset
-                </button>
-            </div>
-
-            <!-- Results -->
-            <div id="resultBox" class="hidden mt-6 p-6 rounded-xl border-2 bg-gradient-to-r from-gray-50 to-blue-50"></div>
-        </div>
-
-        <!-- MODEL PERFORMANCE -->
-        <div class="bg-white shadow-lg rounded-2xl p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">Model Performance</h3>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                    <p class="text-sm text-gray-500">Accuracy</p>
-                    <p class="text-xl font-bold text-indigo-600">95.71%</p>
+        <main class="space-y-6">
+            <section class="bg-white/90 dark:bg-slate-900 shadow-lg rounded-2xl p-6 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-50 flex items-center gap-2">
+                        📧 Email Content Analysis
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-slate-400">
+                        Paste the full body of a single email for analysis.
+                    </p>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-500">Precision</p>
-                    <p class="text-xl font-bold text-indigo-600">93.99%</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Recall</p>
-                    <p class="text-xl font-bold text-indigo-600">95.14%</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">F1 Score</p>
-                    <p class="text-xl font-bold text-indigo-600">94.56%</p>
-                </div>
-            </div>
 
-            <p class="text-xs text-gray-400 mt-3">Model: Logistic Regression | Dataset size: 18,634 emails</p>
-        </div>
+                <!-- SAMPLE EMAIL BUTTONS -->
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <button onclick="loadSample('phishing')"
+                        class="text-xs bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900 transition">
+                        Load Phishing Sample
+                    </button>
 
-        <!-- SECURITY TIPS -->
-        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 shadow-md">
-            <h3 class="text-lg font-semibold mb-3 text-gray-800">⚠️ Common Phishing Red Flags</h3>
-            <ul class="space-y-2 text-gray-700">
-                <li>• Urgent or threatening language</li>
-                <li>• Requests for financial or login info</li>
-                <li>• Suspicious links or attachments</li>
-                <li>• Unexpected sender or generic greetings</li>
-                <li>• Poor grammar or spelling errors</li>
-            </ul>
-        </div>
+                    <button onclick="loadSample('safe')"
+                        class="text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900 transition">
+                        Load Safe Sample
+                    </button>
 
-        <p class="text-center text-xs text-gray-500 mt-6">
-            Designed and defended by Amitabh’s Cyber-AI Lab
-        </p>
+                    <button onclick="loadSample('suspicious')"
+                        class="text-xs bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-4 py-2 rounded-lg border border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900 transition">
+                        Load Suspicious Sample
+                    </button>
+                </div>
+
+                <textarea
+                    id="emailContent"
+                    class="w-full h-52 p-4 text-sm border-2 border-gray-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none transition"
+                    placeholder="Paste the email content you want to analyze..."
+                ></textarea>
+
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <button
+                        onclick="analyzeEmail()"
+                        id="analyzeBtn"
+                        class="flex-1 min-w-[140px] bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        Analyze Email
+                    </button>
+
+                    <button
+                        onclick="resetInput()"
+                        class="px-5 py-3 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl font-medium text-gray-700 dark:text-slate-100 border border-gray-200 dark:border-slate-700 transition"
+                    >
+                        Reset
+                    </button>
+
+                    <button
+                        onclick="downloadReport()"
+                        id="downloadBtn"
+                        class="px-5 py-3 bg-slate-900/90 dark:bg-slate-100 text-slate-50 dark:text-slate-900 rounded-xl font-medium border border-slate-900 dark:border-slate-200 hover:bg-black dark:hover:bg-white transition text-sm"
+                        disabled
+                    >
+                        Download Report
+                    </button>
+                </div>
+
+                <!-- Results -->
+                <div id="resultBox" class="hidden mt-6 p-6 rounded-xl border-2 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 border-gray-200 dark:border-slate-700"></div>
+            </section>
+
+            <!-- MODEL PERFORMANCE -->
+            <section class="bg-white/90 dark:bg-slate-900 shadow-lg rounded-2xl p-6 border border-slate-100 dark:border-slate-800">
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-50">Model Performance</h3>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">Accuracy</p>
+                        <p class="text-xl font-bold text-indigo-600">95.71%</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">Precision</p>
+                        <p class="text-xl font-bold text-indigo-600">93.99%</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">Recall</p>
+                        <p class="text-xl font-bold text-indigo-600">95.14%</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">F1 Score</p>
+                        <p class="text-xl font-bold text-indigo-600">94.56%</p>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-400 dark:text-slate-500 mt-3">
+                    Model: Logistic Regression · Features: TF-IDF (unigrams + bigrams) · Dataset: 18,634 labeled emails
+                </p>
+            </section>
+
+            <!-- SECURITY TIPS -->
+            <section class="bg-yellow-50 dark:bg-amber-900/30 border-2 border-yellow-200 dark:border-amber-700 rounded-2xl p-6 shadow-md">
+                <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-amber-50 flex items-center gap-2">
+                    ⚠️ Common Phishing Red Flags
+                </h3>
+                <ul class="space-y-2 text-gray-800 dark:text-amber-100 text-sm">
+                    <li>• Urgent or threatening language that pressures immediate action</li>
+                    <li>• Requests for passwords, MFA codes, or financial information</li>
+                    <li>• Links that redirect to unfamiliar or slightly misspelled domains</li>
+                    <li>• Unexpected attachments or “invoice” files from unknown senders</li>
+                    <li>• Generic greetings, inconsistent tone, or obvious spelling errors</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-gray-500 dark:text-slate-400 space-y-1">
+            <p>Designed and defended by Amitabh’s Cyber-AI Lab</p>
+            <p class="flex justify-center gap-4">
+                <a href="https://github.com/AmitabhCh822" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-indigo-400 underline-offset-2 hover:underline">
+                    GitHub
+                </a>
+                <span class="text-slate-400">•</span>
+                <a href="https://linkedin.com/in/ami-ch" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-indigo-400 underline-offset-2 hover:underline">
+                    LinkedIn
+                </a>
+            </p>
+        </footer>
     </div>
 
-<!-- MODEL INFO MODAL -->
-<div id="modelModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center">
-    <div class="bg-white p-6 rounded-xl shadow-xl max-w-lg w-full">
-        <h2 class="text-2xl font-bold mb-3 text-gray-800">Model Information</h2>
+    <!-- MODEL INFO MODAL -->
+    <div id="modelModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-xl max-w-lg w-full border border-slate-100 dark:border-slate-700">
+            <h2 class="text-2xl font-bold mb-3 text-gray-900 dark:text-slate-50">Model Information</h2>
 
-        <p class="text-gray-700 mb-2"><strong>Algorithm:</strong> Logistic Regression</p>
-        <p class="text-gray-700 mb-2"><strong>Dataset Size:</strong> 18,634 labeled emails</p>
-        <p class="text-gray-700 mb-2"><strong>Training Features:</strong> TF-IDF (unigrams + bigrams)</p>
-        <p class="text-gray-700 mb-2"><strong>Evaluation:</strong> 95.71% Accuracy, 94.56% F1 Score</p>
+            <div class="space-y-2 text-sm text-gray-800 dark:text-slate-200">
+                <p><strong>Algorithm:</strong> Logistic Regression</p>
+                <p><strong>Dataset:</strong> 18,634 labeled emails (phishing + legitimate)</p>
+                <p><strong>Features:</strong> TF-IDF vectorization over unigrams and bigrams</p>
+                <p><strong>Metrics:</strong> 95.71% Accuracy · 93.99% Precision · 95.14% Recall · 94.56% F1-Score</p>
+            </div>
 
-        <button onclick="closeModelModal()" 
-            class="mt-4 w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-            Close
-        </button>
+            <button
+                onclick="closeModelModal()"
+                class="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition"
+            >
+                Close
+            </button>
+        </div>
     </div>
-</div>
 
-<script>
-/* --- SAMPLE EMAILS --- */
-const samples = {
-    phishing: `URGENT: Your account has been suspended.
+    <script>
+        /* ---------- SAMPLE EMAILS ---------- */
+        const samples = {
+            phishing: `URGENT: Your account has been suspended.
 Click the link below immediately to verify your identity:
 http://malicious-login.com/verify
 Failure to act will result in permanent account closure.`,
 
-    safe: `Hi Team,
+            safe: `Hi Team,
 Just a reminder that the Q4 project meeting is scheduled for Tuesday.
 Let me know if you need any documents beforehand.
 Best,
 John`,
 
-    suspicious: `Hello user,
+            suspicious: `Hello user,
 Your mailbox storage is almost full.
 Click the following link to increase your quota:
 http://unknown-service.com/upgrade`
-};
+        };
 
-function loadSample(type) {
-    document.getElementById("emailContent").value = samples[type];
-}
+        function loadSample(type) {
+            document.getElementById("emailContent").value = samples[type] || "";
+        }
 
-/* --- ANALYSIS --- */
-async function analyzeEmail() {
-    const email = document.getElementById("emailContent").value.trim();
-    const btn = document.getElementById("analyzeBtn");
-    const resultBox = document.getElementById("resultBox");
+        /* ---------- DARK MODE ---------- */
+        const root = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const themeLabel = document.getElementById("themeLabel");
 
-    if (!email) return alert("Please enter email content to analyze");
+        function applyTheme(mode) {
+            if (mode === "dark") {
+                root.classList.add("dark");
+                themeIcon.textContent = "☀️";
+                themeLabel.textContent = "Light";
+            } else {
+                root.classList.remove("dark");
+                themeIcon.textContent = "🌙";
+                themeLabel.textContent = "Dark";
+            }
+            localStorage.setItem("phishguard-theme", mode);
+        }
 
-    btn.innerHTML = '<div class="spinner"></div> Analyzing...';
-    btn.disabled = true;
+        function initTheme() {
+            const stored = localStorage.getItem("phishguard-theme");
+            if (stored) {
+                applyTheme(stored);
+            } else {
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                applyTheme(prefersDark ? "dark" : "light");
+            }
+        }
 
-    try {
-        const response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email })
+        themeToggle.addEventListener("click", () => {
+            const current = root.classList.contains("dark") ? "dark" : "light";
+            applyTheme(current === "dark" ? "light" : "dark");
         });
 
-        const data = await response.json();
-        const isPhishing = data.prediction === 1;
+        /* ---------- NLP HELPERS ---------- */
+        const suspiciousTokens = [
+            "urgent", "immediately", "verify", "confirm", "password", "reset",
+            "suspended", "account locked", "click here", "update billing", "limited time"
+        ];
 
-        /* --- NLP INDICATORS --- */
-        const indicators = [];
-        const lower = email.toLowerCase();
+        function extractUrls(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/gi;
+            const urls = text.match(urlRegex);
+            return urls || [];
+        }
 
-        if (lower.includes("verify") || lower.includes("confirm"))
-            indicators.push("Verification request detected");
-        if (lower.includes("urgent") || lower.includes("immediately"))
-            indicators.push("Urgency / pressure language detected");
-        if (email.includes("http://") || email.includes("https://"))
-            indicators.push("Presence of external links");
-        if (email.length < 40)
-            indicators.push("Email unusually short (possible scam)");
+        function getTopSuspiciousTokens(text) {
+            const lower = text.toLowerCase();
+            return suspiciousTokens.filter(tok => lower.includes(tok));
+        }
 
-        const indicatorList = indicators.length
-            ? indicators.map(i => `<li>${i}</li>`).join("")
-            : "<li>No major phishing indicators detected</li>";
+        /* ---------- BACKEND ANALYSIS ---------- */
+        let lastResultForReport = null;
 
-        resultBox.classList.remove("hidden");
+        async function analyzeEmail() {
+            const email = document.getElementById("emailContent").value.trim();
+            const btn = document.getElementById("analyzeBtn");
+            const resultBox = document.getElementById("resultBox");
+            const downloadBtn = document.getElementById("downloadBtn");
 
-        /* --- UI RESULT BLOCK --- */
-        resultBox.innerHTML = `
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold ${isPhishing ? 'text-red-600' : 'text-green-600'}">
-                    ${isPhishing ? "🚨 Phishing Detected" : "✅ Safe Email"}
-                </h3>
+            if (!email) {
+                alert("Please enter email content to analyze");
+                return;
+            }
 
-                <span class="px-3 py-1 text-sm font-semibold rounded-lg 
-                    ${isPhishing ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
-                    ${isPhishing ? "High Risk" : "Low Risk"}
-                </span>
-            </div>
+            btn.innerHTML = '<div class="spinner"></div> Analyzing...';
+            btn.disabled = true;
+            downloadBtn.disabled = true;
+            resultBox.classList.remove("hidden");
+            resultBox.innerHTML = "<p class='text-sm text-gray-600 dark:text-slate-200'>Running analysis...</p>";
 
-            <p class="text-gray-700 mb-2"><strong>Confidence Score</strong></p>
+            try {
+                const response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
 
-            <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-                <div class="h-3 rounded-full transition-all duration-500 
-                ${isPhishing ? 'bg-red-500' : 'bg-green-500'}" 
-                    style="width: ${isPhishing ? data.phishing_prob : data.safe_prob}%">
-                </div>
-            </div>
+                if (!response.ok) {
+                    throw new Error("Backend returned status " + response.status);
+                }
 
-            <p class="text-gray-700 mb-4">
-                ${(isPhishing ? data.phishing_prob : data.safe_prob)}% confidence this email is 
-                <strong>${isPhishing ? "phishing" : "safe"}</strong>.
-            </p>
+                const data = await response.json();
+                const isPhishing = data.prediction === 1;
 
-            <p class="font-semibold text-gray-700 mb-2">Detected Indicators:</p>
-            <ul class="list-disc ml-6 text-gray-600">
-                ${indicatorList}
-            </ul>
-        `;
+                const safeProb = typeof data.safe_prob === "number" ? data.safe_prob : (isPhishing ? 0 : 50);
+                const phishingProb = typeof data.phishing_prob === "number" ? data.phishing_prob : (isPhishing ? 50 : 0);
 
-    } catch (err) {
-        alert("Error contacting backend.");
-    }
+                // NLP indicators
+                const indicators = [];
+                const lower = email.toLowerCase();
 
-    btn.innerHTML = "Analyze Email";
-    btn.disabled = false;
-}
+                if (lower.includes("verify") || lower.includes("confirm"))
+                    indicators.push("Verification / credential request detected");
+                if (lower.includes("urgent") || lower.includes("immediately"))
+                    indicators.push("Urgency / pressure language detected");
+                if (email.includes("http://") || email.includes("https://"))
+                    indicators.push("Presence of external links");
+                if (email.length < 40)
+                    indicators.push("Email unusually short (possible low-effort scam)");
 
-/* --- RESET --- */
-function resetInput() {
-    document.getElementById("emailContent").value = "";
-    document.getElementById("resultBox").classList.add("hidden");
-}
+                const indicatorList = indicators.length
+                    ? indicators.map(i => `<li>${i}</li>`).join("")
+                    : "<li>No major phishing indicators detected by heuristic checks.</li>";
 
-/* --- MODAL CONTROLS --- */
-function openModelModal() {
-    const modal = document.getElementById("modelModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-}
+                // URLs
+                const urls = extractUrls(email);
+                const urlList = urls.length
+                    ? urls.map(u => `<li><a href="${u}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-300 underline">${u}</a></li>`).join("")
+                    : "<li>No URLs detected in this email.</li>";
 
-function closeModelModal() {
-    document.getElementById("modelModal").classList.add("hidden");
-}
-</script>
+                // Suspicious tokens
+                const tokens = getTopSuspiciousTokens(email);
+                const tokenChips = tokens.length
+                    ? tokens.map(t => `<span class="px-2 py-1 text-xs rounded-full bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700">${t}</span>`).join(" ")
+                    : '<span class="text-xs text-gray-500 dark:text-slate-400">No high-risk keywords matched from the rule list.</span>';
 
+                // Threat label
+                const threatLabel = isPhishing ? "High Risk" : (phishingProb > 30 ? "Medium Risk" : "Low Risk");
+                const threatClass = isPhishing
+                    ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200"
+                    : (phishingProb > 30
+                        ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200"
+                        : "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-200");
+
+                resultBox.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold ${isPhishing ? 'text-red-600' : 'text-green-600'}">
+                            ${isPhishing ? "🚨 Phishing Detected" : "✅ Safe Email"}
+                        </h3>
+
+                        <span class="px-3 py-1 text-xs font-semibold rounded-lg ${threatClass}">
+                            ${threatLabel}
+                        </span>
+                    </div>
+
+                    <p class="text-gray-700 dark:text-slate-100 mb-2 text-sm font-semibold">Confidence Score</p>
+
+                    <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3 mb-3 overflow-hidden">
+                        <div class="h-3 rounded-full transition-all duration-500 ${isPhishing ? 'bg-red-500' : 'bg-green-500'}"
+                            style="width: ${isPhishing ? phishingProb : safeProb}%">
+                        </div>
+                    </div>
+
+                    <p class="text-gray-700 dark:text-slate-100 mb-4 text-sm">
+                        ${(isPhishing ? phishingProb : safeProb).toFixed(2)}% confidence this email is
+                        <strong>${isPhishing ? "phishing" : "safe"}</strong>.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-slate-100 mb-1">Detected Indicators</p>
+                            <ul class="list-disc ml-6 text-gray-700 dark:text-slate-200">
+                                ${indicatorList}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-slate-100 mb-1">URLs Found</p>
+                            <ul class="list-disc ml-6 text-gray-700 dark:text-slate-200 break-all">
+                                ${urlList}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="font-semibold text-gray-800 dark:text-slate-100 mb-2 text-sm">Explainability (keyword signals)</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${tokenChips}
+                        </div>
+                    </div>
+                `;
+
+                lastResultForReport = {
+                    isPhishing,
+                    safeProb,
+                    phishingProb,
+                    threatLabel,
+                    indicators,
+                    urls,
+                    tokens,
+                    raw: email
+                };
+                downloadBtn.disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                resultBox.innerHTML = `
+                    <p class="text-sm text-red-600 dark:text-red-300">
+                        Error contacting backend. Please try again in a moment.
+                    </p>
+                `;
+            }
+
+            btn.innerHTML = "Analyze Email";
+            btn.disabled = false;
+        }
+
+        /* ---------- REPORT DOWNLOAD (PRINT TO PDF) ---------- */
+        function downloadReport() {
+            if (!lastResultForReport) {
+                alert("Run an analysis before downloading a report.");
+                return;
+            }
+
+            const w = window.open("", "_blank");
+            if (!w) return;
+
+            const { isPhishing, safeProb, phishingProb, threatLabel, indicators, urls, tokens, raw } = lastResultForReport;
+
+            w.document.write(`
+                <html>
+                    <head>
+                        <title>PhishGuard AI Report</title>
+                        <style>
+                            body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; }
+                            h1, h2 { margin: 0 0 8px 0; }
+                            .section { margin-bottom: 20px; }
+                            .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>PhishGuard AI – Email Analysis Report</h1>
+                        <p><strong>Overall verdict:</strong> ${isPhishing ? "Phishing" : "Safe"} (${threatLabel})</p>
+                        <p><strong>Confidence:</strong> Safe ${safeProb.toFixed(2)}% · Phishing ${phishingProb.toFixed(2)}%</p>
+
+                        <div class="section">
+                            <h2>Indicators</h2>
+                            <ul>
+                                ${
+                                    indicators.length
+                                        ? indicators.map(i => `<li>${i}</li>`).join("")
+                                        : "<li>No major heuristic indicators triggered.</li>"
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h2>URLs</h2>
+                            <ul>
+                                ${
+                                    urls.length
+                                        ? urls.map(u => `<li>${u}</li>`).join("")
+                                        : "<li>No URLs detected.</li>"
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h2>Keyword Signals</h2>
+                            <p>
+                                ${
+                                    tokens.length
+                                        ? tokens.join(", ")
+                                        : "No high-risk keywords matched from the rule list."
+                                }
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h2>Original Email Content</h2>
+                            <pre style="white-space: pre-wrap; border: 1px solid #ddd; padding: 12px; border-radius: 8px;">${raw.replace(/</g, "&lt;")}</pre>
+                        </div>
+
+                        <script>
+                            window.print();
+                        </script>
+                    </body>
+                </html>
+            `);
+            w.document.close();
+        }
+
+        /* ---------- RESET ---------- */
+        function resetInput() {
+            document.getElementById("emailContent").value = "";
+            document.getElementById("resultBox").classList.add("hidden");
+            document.getElementById("downloadBtn").disabled = true;
+            lastResultForReport = null;
+        }
+
+        /* ---------- MODAL CONTROLS ---------- */
+        function openModelModal() {
+            const modal = document.getElementById("modelModal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeModelModal() {
+            const modal = document.getElementById("modelModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        /* ---------- INIT ---------- */
+        document.addEventListener("DOMContentLoaded", () => {
+            initTheme();
+
+            // Ctrl+Enter to analyze
+            const textarea = document.getElementById("emailContent");
+            textarea.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && e.ctrlKey) {
+                    e.preventDefault();
+                    analyzeEmail();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
