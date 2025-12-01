@@ -8,15 +8,14 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="logo.png" />
 
-    <!-- Tailwind with dark mode enabled -->
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind = {
-            config: {
-                darkMode: 'class'
-            }
+        // Tailwind config (enable class-based dark mode)
+        tailwind.config = {
+            darkMode: 'class'
         };
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         .spinner {
@@ -242,7 +241,9 @@ http://unknown-service.com/upgrade`
         };
 
         function loadSample(type) {
-            document.getElementById("emailContent").value = samples[type] || "";
+            const textarea = document.getElementById("emailContent");
+            if (!textarea) return;
+            textarea.value = samples[type] || "";
         }
 
         /* ---------- DARK MODE ---------- */
@@ -254,30 +255,43 @@ http://unknown-service.com/upgrade`
         function applyTheme(mode) {
             if (mode === "dark") {
                 root.classList.add("dark");
-                themeIcon.textContent = "☀️";
-                themeLabel.textContent = "Light";
+                if (themeIcon) themeIcon.textContent = "☀️";
+                if (themeLabel) themeLabel.textContent = "Light";
             } else {
                 root.classList.remove("dark");
-                themeIcon.textContent = "🌙";
-                themeLabel.textContent = "Dark";
+                if (themeIcon) themeIcon.textContent = "🌙";
+                if (themeLabel) themeLabel.textContent = "Dark";
             }
-            localStorage.setItem("phishguard-theme", mode);
+            try {
+                localStorage.setItem("phishguard-theme", mode);
+            } catch (e) {
+                // ignore storage errors
+            }
         }
 
         function initTheme() {
-            const stored = localStorage.getItem("phishguard-theme");
-            if (stored) {
+            let stored = null;
+            try {
+                stored = localStorage.getItem("phishguard-theme");
+            } catch (e) {
+                stored = null;
+            }
+
+            if (stored === "dark" || stored === "light") {
                 applyTheme(stored);
             } else {
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                const prefersDark = window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches;
                 applyTheme(prefersDark ? "dark" : "light");
             }
         }
 
-        themeToggle.addEventListener("click", () => {
-            const current = root.classList.contains("dark") ? "dark" : "light";
-            applyTheme(current === "dark" ? "light" : "dark");
-        });
+        if (themeToggle) {
+            themeToggle.addEventListener("click", () => {
+                const current = root.classList.contains("dark") ? "dark" : "light";
+                applyTheme(current === "dark" ? "light" : "dark");
+            });
+        }
 
         /* ---------- NLP HELPERS ---------- */
         const suspiciousTokens = [
@@ -300,10 +314,14 @@ http://unknown-service.com/upgrade`
         let lastResultForReport = null;
 
         async function analyzeEmail() {
-            const email = document.getElementById("emailContent").value.trim();
+            const textarea = document.getElementById("emailContent");
             const btn = document.getElementById("analyzeBtn");
             const resultBox = document.getElementById("resultBox");
             const downloadBtn = document.getElementById("downloadBtn");
+
+            if (!textarea || !btn || !resultBox || !downloadBtn) return;
+
+            const email = textarea.value.trim();
 
             if (!email) {
                 alert("Please enter email content to analyze");
@@ -330,8 +348,12 @@ http://unknown-service.com/upgrade`
                 const data = await response.json();
                 const isPhishing = data.prediction === 1;
 
-                const safeProb = typeof data.safe_prob === "number" ? data.safe_prob : (isPhishing ? 0 : 50);
-                const phishingProb = typeof data.phishing_prob === "number" ? data.phishing_prob : (isPhishing ? 50 : 0);
+                const safeProb = typeof data.safe_prob === "number"
+                    ? data.safe_prob
+                    : (isPhishing ? 0 : 50);
+                const phishingProb = typeof data.phishing_prob === "number"
+                    ? data.phishing_prob
+                    : (isPhishing ? 50 : 0);
 
                 // NLP indicators
                 const indicators = [];
@@ -353,17 +375,23 @@ http://unknown-service.com/upgrade`
                 // URLs
                 const urls = extractUrls(email);
                 const urlList = urls.length
-                    ? urls.map(u => `<li><a href="${u}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-300 underline">${u}</a></li>`).join("")
+                    ? urls.map(u =>
+                        `<li><a href="${u}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-300 underline">${u}</a></li>`
+                      ).join("")
                     : "<li>No URLs detected in this email.</li>";
 
                 // Suspicious tokens
                 const tokens = getTopSuspiciousTokens(email);
                 const tokenChips = tokens.length
-                    ? tokens.map(t => `<span class="px-2 py-1 text-xs rounded-full bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700">${t}</span>`).join(" ")
+                    ? tokens.map(t =>
+                        `<span class="px-2 py-1 text-xs rounded-full bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700">${t}</span>`
+                      ).join(" ")
                     : '<span class="text-xs text-gray-500 dark:text-slate-400">No high-risk keywords matched from the rule list.</span>';
 
                 // Threat label
-                const threatLabel = isPhishing ? "High Risk" : (phishingProb > 30 ? "Medium Risk" : "Low Risk");
+                const threatLabel = isPhishing
+                    ? "High Risk"
+                    : (phishingProb > 30 ? "Medium Risk" : "Low Risk");
                 const threatClass = isPhishing
                     ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200"
                     : (phishingProb > 30
@@ -520,21 +548,27 @@ http://unknown-service.com/upgrade`
 
         /* ---------- RESET ---------- */
         function resetInput() {
-            document.getElementById("emailContent").value = "";
-            document.getElementById("resultBox").classList.add("hidden");
-            document.getElementById("downloadBtn").disabled = true;
+            const textarea = document.getElementById("emailContent");
+            const resultBox = document.getElementById("resultBox");
+            const downloadBtn = document.getElementById("downloadBtn");
+
+            if (textarea) textarea.value = "";
+            if (resultBox) resultBox.classList.add("hidden");
+            if (downloadBtn) downloadBtn.disabled = true;
             lastResultForReport = null;
         }
 
         /* ---------- MODAL CONTROLS ---------- */
         function openModelModal() {
             const modal = document.getElementById("modelModal");
+            if (!modal) return;
             modal.classList.remove("hidden");
             modal.classList.add("flex");
         }
 
         function closeModelModal() {
             const modal = document.getElementById("modelModal");
+            if (!modal) return;
             modal.classList.add("hidden");
             modal.classList.remove("flex");
         }
@@ -545,12 +579,14 @@ http://unknown-service.com/upgrade`
 
             // Ctrl+Enter to analyze
             const textarea = document.getElementById("emailContent");
-            textarea.addEventListener("keydown", (e) => {
-                if (e.key === "Enter" && e.ctrlKey) {
-                    e.preventDefault();
-                    analyzeEmail();
-                }
-            });
+            if (textarea) {
+                textarea.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" && e.ctrlKey) {
+                        e.preventDefault();
+                        analyzeEmail();
+                    }
+                });
+            }
         });
     </script>
 </body>
