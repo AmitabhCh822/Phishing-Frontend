@@ -70,7 +70,7 @@
 
         <!-- MODEL PERFORMANCE -->
         <div class="bg-white shadow-lg rounded-2xl p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">📊 Model Performance</h3>
+            <h3 class="text-lg font-semibold mb-4">Model Performance</h3>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
@@ -122,7 +122,6 @@ async function analyzeEmail() {
         return;
     }
 
-    // Spinner
     btn.innerHTML = '<div class="spinner"></div> Analyzing...';
     btn.disabled = true;
 
@@ -134,26 +133,27 @@ async function analyzeEmail() {
         });
 
         const data = await response.json();
-        resultBox.classList.remove("hidden");
+        const isPhishing = data.prediction === 1;
 
-        const isPhishing = data.prediction === 1 || data.label === "phishing";
+        resultBox.classList.remove("hidden");
 
         resultBox.innerHTML = `
             <h3 class="text-xl font-bold mb-3 ${isPhishing ? 'text-red-600' : 'text-green-600'}">
                 ${isPhishing ? "🚨 Phishing Detected" : "✅ Safe Email"}
             </h3>
-        
+
             <p class="text-gray-700 text-lg font-medium">
-                Confidence: ${(isPhishing ? data.phishing_prob : data.safe_prob).toFixed(2)}%
+                The model classified this email as: <span class="font-bold">
+                ${isPhishing ? "Phishing" : "Safe"}</span>.
             </p>
-        
+
             <div class="mt-4">
                 <p class="font-semibold text-gray-700">Indicators:</p>
                 <ul class="list-disc ml-6 text-gray-600">
                     ${
                         isPhishing
-                        ? "<li>Patterns matching known phishing behavior</li><li>Suspicious content detected</li>"
-                        : "<li>No major phishing indicators found</li>"
+                        ? "<li>Suspicious language detected</li><li>Matches known phishing patterns</li>"
+                        : "<li>No strong phishing indicators found</li>"
                     }
                 </ul>
             </div>
