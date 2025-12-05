@@ -197,10 +197,7 @@ function loadSample(type) {
     document.getElementById("emailContent").value = samples[type];
 }
 
-/* ==========================================================
-   ANALYSIS
-   ========================================================== */
-
+/* ANALYSIS */
 async function analyzeEmail() {
     const email = document.getElementById("emailContent").value.trim();
     const btn = document.getElementById("analyzeBtn");
@@ -211,110 +208,102 @@ async function analyzeEmail() {
     btn.innerHTML = '<div class="spinner"></div> Analyzing...';
     btn.disabled = true;
 
-    let response, data;
-
     try {
-        response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
+        const response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email })
+            body: JSON.stringify({ email })
         });
 
-        if (!response.ok) {
-            throw new Error("Backend returned non-200");
+        const data = await response.json();
+
+        // three-class logic:
+        // 1 = phishing, -1 = suspicious, 0 = safe
+        let label = "";
+        let color = "";
+        let badge = "";
+        let barColor = "";
+        let confidence = 0;
+
+        if (data.prediction === 1) {
+            label = "🚨 Phishing Detected";
+            badge = "High Risk";
+            color = "text-red-600";
+            barColor = "bg-red-500";
+            confidence = data.phishing_prob;
+        } 
+        else if (data.prediction === -1) {
+            label = "⚠️ Suspicious Email";
+            badge = "Medium Risk";
+            color = "text-yellow-600";
+            barColor = "bg-yellow-500";
+            confidence = data.phishing_prob;
+        } 
+        else {
+            label = "✅ Safe Email";
+            badge = "Low Risk";
+            color = "text-green-600";
+            barColor = "bg-green-500";
+            confidence = data.safe_prob;
         }
 
-        data = await response.json();
-    } 
-    catch (err) {
-        console.error("Backend error:", err);
-        alert("Backend is waking up. Please wait 10–15 seconds and try again.");
-        btn.innerHTML = "Analyze Email";
-        btn.disabled = false;
-        return;
-    }
+        /* Basic indicator detection */
+        const indicators = [];
+        const lower = email.toLowerCase();
 
-    /* ===========================
-       CLASS INTERPRETATION
-       =========================== */
-    const status = data.prediction;   // 1 = phishing, -1 = suspicious, 0 = safe
+        if (lower.includes("verify") || lower.includes("confirm"))
+            indicators.push("Verification request detected");
 
-    let title = "";
-    let badge = "";
-    let barColor = "";
-    let score = 0;
-    let confidenceText = "";
+        if (lower.includes("urgent") || lower.includes("immediately"))
+            indicators.push("Urgency or pressure language detected");
 
-    if (status === 1) {
-        title = "🚨 Phishing Detected";
-        badge = "bg-red-100 text-red-700";
-        barColor = "bg-red-500";
-        score = data.phishing_prob;
-        confidenceText = `${score}% confidence this email is phishing.`;
-    }
-    else if (status === -1) {
-        title = "⚠️ Suspicious Email";
-        badge = "bg-yellow-100 text-yellow-700";
-        barColor = "bg-yellow-500";
-        score = data.phishing_prob;
-        confidenceText = `${score}% chance this email is suspicious. Contains risky indicators.`;
-    }
-    else {
-        title = "✅ Safe Email";
-        badge = "bg-green-100 text-green-700";
-        barColor = "bg-green-500";
-        score = data.safe_prob;
-        confidenceText = `${score}% confidence this email is safe.`;
-    }
+        if (email.includes("http://") || email.includes("https://"))
+            indicators.push("External link detected");
 
-    /* ===========================
-       INDICATORS
-       =========================== */
-    const indicators = [];
-    const lower = email.toLowerCase();
+        if (email.length < 40)
+            indicators.push("Email unusually short (possible scam)");
 
-    if (lower.includes("verify") || lower.includes("confirm"))
-        indicators.push("Verification request detected");
-    if (lower.includes("urgent") || lower.includes("immediately"))
-        indicators.push("Urgency / pressure language detected");
-    if (email.includes("http://") || email.includes("https://"))
-        indicators.push("Presence of external links");
-    if (email.length < 40)
-        indicators.push("Email unusually short (possible scam)");
+        const indicatorList =
+            indicators.length
+                ? indicators.map(i => `<li>${i}</li>`).join("")
+                : "<li>No major phishing indicators detected</li>";
 
-    const indicatorList = indicators.length
-        ? indicators.map(i => `<li>${i}</li>`).join("")
-        : "<li>No major phishing indicators detected</li>";
-
-    /* ===========================
-       DISPLAY RESULTS
-       =========================== */
-    resultBox.classList.remove("hidden");
-
-    resultBox.innerHTML = `
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-            <h3 class="text-xl font-bold">${title}</h3>
-
-            <span class="px-3 py-1 text-sm font-semibold rounded-lg mt-2 sm:mt-0 ${badge}">
-                ${status === 1 ? "High Risk" : status === -1 ? "Medium Risk" : "Low Risk"}
-            </span>
-        </div>
-
-        <p class="text-gray-700 mb-2"><strong>Confidence Score</strong></p>
-
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-            <div class="h-3 rounded-full transition-all duration-500 ${barColor}"
-                style="width: ${score}%;">
+        /* Render result */
+        resultBox.classList.remove("hidden");
+        resultBox.innerHTML = `
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+                <h3 class="text-xl font-bold ${color}">${label}</h3>
+                <span class="px-3 py-1 text-sm font-semibold rounded-lg mt-2 sm:mt-0
+                    ${data.prediction === 1 ? 'bg-red-100 text-red-700' : 
+                       data.prediction === -1 ? 'bg-yellow-100 text-yellow-700' : 
+                                                'bg-green-100 text-green-700'}">
+                    ${badge}
+                </span>
             </div>
-        </div>
 
-        <p class="text-gray-700 mb-4">${confidenceText}</p>
+            <p class="text-gray-700 mb-2"><strong>Confidence Score</strong></p>
 
-        <p class="font-semibold text-gray-700 mb-2">Detected Indicators:</p>
-        <ul class="list-disc ml-6 text-gray-600">
-            ${indicatorList}
-        </ul>
-    `;
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+                <div class="h-3 rounded-full transition-all duration-500 ${barColor}"
+                     style="width: ${confidence}%;">
+                </div>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                ${confidence}% confidence this email is 
+                <strong>${data.label}</strong>.
+            </p>
+
+            <p class="font-semibold text-gray-700 mb-2">Detected Indicators:</p>
+            <ul class="list-disc ml-6 text-gray-600">
+                ${indicatorList}
+            </ul>
+        `;
+
+    } catch (err) {
+        alert("Error contacting backend.");
+        console.error(err);
+    }
 
     btn.innerHTML = "Analyze Email";
     btn.disabled = false;
@@ -328,9 +317,8 @@ function resetInput() {
 
 /* MODAL */
 function openModelModal() {
-    const modal = document.getElementById("modelModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+    document.getElementById("modelModal").classList.remove("hidden");
+    document.getElementById("modelModal").classList.add("flex");
 }
 
 function closeModelModal() {
