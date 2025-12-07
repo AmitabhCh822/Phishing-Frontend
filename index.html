@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PhishGuard AI</title>
 
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png"/>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -17,7 +17,7 @@
             height: 40px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg);} }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     </style>
 </head>
 
@@ -26,17 +26,16 @@
 <div class="max-w-5xl mx-auto px-4">
 
     <!-- HEADER -->
-    <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mb-6 
-                flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mb-6 flex flex-col md:flex-row 
+                md:items-center md:justify-between gap-4">
 
         <div class="flex items-center gap-3 sm:gap-4">
-            <img src="logo.png" alt="Logo" class="w-12 h-12 sm:w-14 sm:h-14">
+            <img src="logo.png" class="w-12 h-12 sm:w-14 sm:h-14"/>
 
             <div class="flex flex-col leading-tight">
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900">
                     PhishGuard AI
                 </h1>
-
                 <p class="text-base sm:text-lg text-gray-600">
                     AI-Powered Phishing Email Detector
                 </p>
@@ -48,11 +47,13 @@
             <p class="text-2xl sm:text-3xl font-bold text-green-600">95.71%</p>
 
             <button onclick="openModelModal()" 
-                class="mt-2 text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg border border-indigo-300 hover:bg-indigo-200">
+                class="mt-2 text-xs px-3 py-1 bg-indigo-100 text-indigo-700 
+                       rounded-lg border border-indigo-300 hover:bg-indigo-200">
                 Model Info
             </button>
         </div>
     </div>
+
 
     <!-- MAIN PANEL -->
     <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mb-6 border border-gray-100">
@@ -61,80 +62,78 @@
             📧 Email Content Analysis
         </h2>
 
-        <!-- SAMPLE EMAIL BUTTONS -->
+        <!-- SAMPLE BUTTONS -->
         <div class="flex flex-wrap gap-2 sm:gap-3 mb-4">
             <button onclick="loadSample('phishing')" 
-                class="text-sm bg-red-50 text-red-700 px-3 sm:px-4 py-2 rounded-lg border border-red-200 hover:bg-red-100">
+                class="text-sm bg-red-50 text-red-700 px-3 py-2 rounded-lg 
+                       border border-red-200 hover:bg-red-100">
                 Load Phishing Sample
             </button>
 
             <button onclick="loadSample('safe')" 
-                class="text-sm bg-green-50 text-green-700 px-3 sm:px-4 py-2 rounded-lg border border-green-200 hover:bg-green-100">
+                class="text-sm bg-green-50 text-green-700 px-3 py-2 rounded-lg 
+                       border border-green-200 hover:bg-green-100">
                 Load Safe Sample
             </button>
 
             <button onclick="loadSample('suspicious')" 
-                class="text-sm bg-yellow-50 text-yellow-700 px-3 sm:px-4 py-2 rounded-lg border border-yellow-200 hover:bg-yellow-100">
+                class="text-sm bg-yellow-50 text-yellow-700 px-3 py-2 rounded-lg 
+                       border border-yellow-200 hover:bg-yellow-100">
                 Load Suspicious Sample
             </button>
         </div>
 
-        <textarea
-            id="emailContent"
+        <textarea id="emailContent"
             class="w-full h-40 sm:h-52 md:h-64 p-4 border-2 border-gray-300 rounded-xl 
                    focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
-            placeholder="Paste the email content you want to analyze..."
-        ></textarea>
+            placeholder="Paste the email content you want to analyze..."></textarea>
 
         <div class="flex flex-col sm:flex-row gap-3 mt-4">
-            <button
-                onclick="analyzeEmail()"
-                id="analyzeBtn"
+            <button id="analyzeBtn" onclick="analyzeEmail()"
                 class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl 
-                       font-semibold transition flex items-center justify-center gap-2"
-            >
+                       font-semibold transition flex items-center justify-center gap-2">
                 Analyze Email
             </button>
 
-            <button
-                onclick="resetInput()"
-                class="px-5 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium text-gray-700"
-            >
+            <button onclick="resetInput()"
+                class="px-5 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium text-gray-700">
                 Reset
             </button>
         </div>
 
         <div id="resultBox" 
-             class="hidden mt-6 p-6 rounded-xl border-2 bg-gradient-to-r from-gray-50 to-blue-50 break-words">
+            class="hidden mt-6 p-6 rounded-xl border-2 bg-gradient-to-r 
+                   from-gray-50 to-blue-50 break-words">
         </div>
     </div>
 
+
     <!-- MODEL PERFORMANCE -->
     <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mb-6 border border-gray-100">
-
         <h3 class="text-lg sm:text-xl font-semibold mb-4">Model Performance</h3>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center md:text-left">
             <div>
-                <p class="text-xs sm:text-sm text-gray-500">Accuracy</p>
+                <p class="text-xs text-gray-500">Accuracy</p>
                 <p class="text-xl font-bold text-indigo-600">95.71%</p>
             </div>
             <div>
-                <p class="text-xs sm:text-sm text-gray-500">Precision</p>
+                <p class="text-xs text-gray-500">Precision</p>
                 <p class="text-xl font-bold text-indigo-600">93.99%</p>
             </div>
             <div>
-                <p class="text-xs sm:text-sm text-gray-500">Recall</p>
+                <p class="text-xs text-gray-500">Recall</p>
                 <p class="text-xl font-bold text-indigo-600">95.14%</p>
             </div>
             <div>
-                <p class="text-xs sm:text-sm text-gray-500">F1 Score</p>
+                <p class="text-xs text-gray-500">F1 Score</p>
                 <p class="text-xl font-bold text-indigo-600">94.56%</p>
             </div>
         </div>
 
         <p class="text-xs text-gray-400 mt-3">Model: Logistic Regression | Dataset size: 18,634 emails</p>
     </div>
+
 
     <!-- SECURITY TIPS -->
     <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 sm:p-6 shadow-md">
@@ -156,6 +155,7 @@
     </p>
 </div>
 
+
 <!-- MODEL INFO MODAL -->
 <div id="modelModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center">
     <div class="bg-white p-6 rounded-xl shadow-xl max-w-lg w-full">
@@ -163,8 +163,8 @@
 
         <p class="text-gray-700 mb-2"><strong>Algorithm:</strong> Logistic Regression</p>
         <p class="text-gray-700 mb-2"><strong>Dataset Size:</strong> 18,634 labeled emails</p>
-        <p class="text-gray-700 mb-2"><strong>Training Features:</strong> TF-IDF (unigrams + bigrams)</p>
-        <p class="text-gray-700 mb-2"><strong>Evaluation:</strong> 95.71% Accuracy, 94.56% F1 Score</p>
+        <p class="text-gray-700 mb-2"><strong>Features:</strong> TF-IDF (unigrams + bigrams)</p>
+        <p class="text-gray-700 mb-2"><strong>Evaluation:</strong> Accuracy 95.71%, F1 94.56%</p>
 
         <button onclick="closeModelModal()" 
             class="mt-4 w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
@@ -174,72 +174,59 @@
 </div>
 
 <script>
-/* SAMPLE EMAILS */
 const samples = {
     phishing: `URGENT: Your account has been suspended.
-Click the link below immediately to verify your identity:
-http://malicious-login.com/verify
-Failure to act will result in permanent account closure.`,
-
+Click below immediately to verify your identity:
+http://malicious-login.com/verify`,
     safe: `Hi Team,
-Just a reminder that the Q4 project meeting is scheduled for Tuesday.
-Let me know if you need any documents beforehand.
-Best,
-John`,
-
-    suspicious: `Hello user,
+Just a reminder about Tuesday’s meeting.
+Let me know if you need anything.`,
+    suspicious: `Hello,
 Your mailbox storage is almost full.
-Click the following link to increase your quota:
-http://unknown-service.com/upgrade`
+Click the link to increase your quota.`
 };
 
-function loadSample(type) {
+function loadSample(type){
     document.getElementById("emailContent").value = samples[type];
 }
 
-/* ANALYSIS */
-async function analyzeEmail() {
+async function analyzeEmail(){
     const email = document.getElementById("emailContent").value.trim();
     const btn = document.getElementById("analyzeBtn");
     const resultBox = document.getElementById("resultBox");
 
-    if (!email) return alert("Please enter email content to analyze");
+    if(!email) return alert("Please paste an email to analyze.");
 
-    btn.innerHTML = '<div class="spinner"></div> Analyzing...';
     btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Analyzing...';
 
-    try {
-        const response = await fetch("https://phishing-backend-axca.onrender.com/predict", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email })
+    try{
+        const response = await fetch("https://phishing-backend-axca.onrender.com/predict",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({email})
         });
 
         const data = await response.json();
 
-        // three-class logic:
-        // 1 = phishing, -1 = suspicious, 0 = safe
-        let label = "";
-        let color = "";
-        let badge = "";
-        let barColor = "";
+        let label="", badge="", color="", barColor="";
         let confidence = 0;
 
-        if (data.prediction === 1) {
+        if(data.prediction === 1){
             label = "🚨 Phishing Detected";
             badge = "High Risk";
             color = "text-red-600";
             barColor = "bg-red-500";
             confidence = data.phishing_prob;
-        } 
-        else if (data.prediction === -1) {
+        }
+        else if(data.prediction === -1){
             label = "⚠️ Suspicious Email";
             badge = "Medium Risk";
             color = "text-yellow-600";
             barColor = "bg-yellow-500";
             confidence = data.phishing_prob;
-        } 
-        else {
+        }
+        else{
             label = "✅ Safe Email";
             badge = "Low Risk";
             color = "text-green-600";
@@ -247,36 +234,30 @@ async function analyzeEmail() {
             confidence = data.safe_prob;
         }
 
-        /* Basic indicator detection */
-        const indicators = [];
         const lower = email.toLowerCase();
+        const indicators = [];
 
-        if (lower.includes("verify") || lower.includes("confirm"))
-            indicators.push("Verification request detected");
+        if(lower.includes("verify") || lower.includes("confirm"))
+            indicators.push("Verification-style language detected");
 
-        if (lower.includes("urgent") || lower.includes("immediately"))
-            indicators.push("Urgency or pressure language detected");
+        if(lower.includes("urgent") || lower.includes("immediately"))
+            indicators.push("Urgent or pressure wording detected");
 
-        if (email.includes("http://") || email.includes("https://"))
+        if(email.includes("http://") || email.includes("https://"))
             indicators.push("External link detected");
 
-        if (email.length < 40)
-            indicators.push("Email unusually short (possible scam)");
+        const indicatorList = indicators.length
+            ? indicators.map(i => `<li>${i}</li>`).join("")
+            : "<li>No major phishing signals detected</li>";
 
-        const indicatorList =
-            indicators.length
-                ? indicators.map(i => `<li>${i}</li>`).join("")
-                : "<li>No major phishing indicators detected</li>";
-
-        /* Render result */
         resultBox.classList.remove("hidden");
         resultBox.innerHTML = `
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <h3 class="text-xl font-bold ${color}">${label}</h3>
-                <span class="px-3 py-1 text-sm font-semibold rounded-lg mt-2 sm:mt-0
-                    ${data.prediction === 1 ? 'bg-red-100 text-red-700' : 
-                       data.prediction === -1 ? 'bg-yellow-100 text-yellow-700' : 
-                                                'bg-green-100 text-green-700'}">
+                <span class="px-3 py-1 text-sm font-semibold rounded-lg 
+                    ${data.prediction===1 ? "bg-red-100 text-red-700" : 
+                      data.prediction===-1 ? "bg-yellow-100 text-yellow-700" : 
+                                             "bg-green-100 text-green-700"}">
                     ${badge}
                 </span>
             </div>
@@ -284,9 +265,8 @@ async function analyzeEmail() {
             <p class="text-gray-700 mb-2"><strong>Confidence Score</strong></p>
 
             <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-                <div class="h-3 rounded-full transition-all duration-500 ${barColor}"
-                     style="width: ${confidence}%;">
-                </div>
+                <div class="h-3 rounded-full transition-all ${barColor}"
+                    style="width:${confidence}%"></div>
             </div>
 
             <p class="text-gray-700 mb-4">
@@ -299,9 +279,9 @@ async function analyzeEmail() {
                 ${indicatorList}
             </ul>
         `;
-
-    } catch (err) {
-        alert("Error contacting backend.");
+    }
+    catch(err){
+        alert("Backend error — service unreachable.");
         console.error(err);
     }
 
@@ -309,19 +289,18 @@ async function analyzeEmail() {
     btn.disabled = false;
 }
 
-/* RESET */
-function resetInput() {
-    document.getElementById("emailContent").value = "";
+function resetInput(){
+    document.getElementById("emailContent").value="";
     document.getElementById("resultBox").classList.add("hidden");
 }
 
-/* MODAL */
-function openModelModal() {
-    document.getElementById("modelModal").classList.remove("hidden");
-    document.getElementById("modelModal").classList.add("flex");
+function openModelModal(){
+    const m = document.getElementById("modelModal");
+    m.classList.remove("hidden");
+    m.classList.add("flex");
 }
 
-function closeModelModal() {
+function closeModelModal(){
     document.getElementById("modelModal").classList.add("hidden");
 }
 </script>
